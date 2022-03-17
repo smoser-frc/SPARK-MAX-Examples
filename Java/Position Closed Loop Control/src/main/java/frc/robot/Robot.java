@@ -81,7 +81,7 @@ public class Robot extends TimedRobot {
     motorInfo.id = canID;
     motorInfo.name = name;
 
-    ShuffleboardLayout motorGroup = shuffTab.getLayout(name + "(" + canID + ")", BuiltInLayouts.kList);
+    ShuffleboardLayout motorGroup = shuffTab.getLayout(name + "(" + canID + ")", BuiltInLayouts.kList).withSize(1, 2);
     motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).getEntry();
     motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).getEntry();
 
@@ -93,7 +93,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     motors = new ArrayList<MotorInfo>();
 
-    ShuffleboardLayout pidGroup = shuffTab.getLayout("PID", BuiltInLayouts.kList);
+    ShuffleboardLayout pidGroup = shuffTab.getLayout("PID", BuiltInLayouts.kList).withSize(2, 4);
     ntEntryP = pidGroup.add("P Gain", kP).getEntry();
     ntEntryI = pidGroup.add("I Gain", kI).getEntry();
     ntEntryD = pidGroup.add("D Gain", kD).getEntry();
@@ -107,7 +107,7 @@ public class Robot extends TimedRobot {
             withProperties(Map.of("min", 0, "max", 1)).getEntry();
 
 
-    ShuffleboardLayout driveGroup = shuffTab.getLayout("Drive", BuiltInLayouts.kList);
+    ShuffleboardLayout driveGroup = shuffTab.getLayout("Drive", BuiltInLayouts.kList).withSize(1, 2);
     driveGo = driveGroup.add("Go", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     driveRotations = driveGroup.add("Rotations", 0).getEntry();
 
