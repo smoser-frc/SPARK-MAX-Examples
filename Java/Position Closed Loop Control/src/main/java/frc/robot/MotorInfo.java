@@ -14,5 +14,6 @@ public class MotorInfo {
     public String name;
     public NetworkTableEntry ntRotTarget;
     public NetworkTableEntry ntRotCurrent;
+    public NetworkTableEntry ntEnable;
 
 }

@@ -84,6 +84,7 @@ public class Robot extends TimedRobot {
     ShuffleboardLayout motorGroup = shuffTab.getLayout(name + "(" + canID + ")", BuiltInLayouts.kList).withSize(1, 2);
     motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).getEntry();
     motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).getEntry();
+    motorInfo.ntEnable = motorGroup.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
 
     return motorInfo;
   }
@@ -128,46 +129,35 @@ public class Robot extends TimedRobot {
     double xMin = ntEntryMinOut.getDouble(0.0);
     // double rotations = SmartDashboard.getNumber("Set Rotations", 0);
 
-    if (xP != kP) {
-        kP = xP;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setP(xP);
-        }
-    }
+    MotorInfo m;
+    SparkMaxPIDController p;
 
-    if (xI != kI) {
-        kI = xI;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setI(xI);
+    for (int i=0; i<motors.size(); i++) {
+        m = motors.get(i);
+        p = m.pidController;
+        if (!m.ntEnable.getBoolean(true)) {
+            continue;
         }
-    }
-
-    if (xD != kD) {
-        kD = xD;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setD(xD);
+        if (xP != kP) {
+            kP = xP;
+            p.setP(xP);
         }
-    }
-
-    if (xIz != kIz) {
-        kIz = xIz;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setIZone(xIz);
+        if (xI != kI) {
+            kI = xI;
+            p.setI(xI);
         }
-    }
-
-    if (xFF != kFF) {
-        kFF = xFF;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setFF(xFF);
+        if (xIz != kIz) {
+            kIz = xIz;
+            p.setIZone(xIz);
         }
-    }
-
-    if ((xMax != kMaxOutput) || (xMin != kMaxOutput)) {
-        kMinOutput = xMax;
-        kMaxOutput = xMax;
-        for (int i=0; i<motors.size(); i++) {
-            motors.get(i).pidController.setOutputRange(xMin, xMax);
+        if (xFF != kFF) {
+            kFF = xFF;
+            p.setFF(xFF);
+        }
+        if ((xMax != kMaxOutput) || (xMin != kMaxOutput)) {
+            kMinOutput = xMax;
+            kMaxOutput = xMax;
+            p.setOutputRange(xMin, xMax);
         }
     }
   }
@@ -204,6 +194,9 @@ public class Robot extends TimedRobot {
             updatePidControllers();
             for(int i=0; i<motors.size(); i++) {
                 m = motors.get(i);
+                if (!m.ntEnable.getBoolean(true)) {
+                    continue;
+                }
                 currentRot = m.encoder.getPosition();
                 targetRot = currentRot + rotations;
                 m.pidController.setReference(targetRot, CANSparkMax.ControlType.kPosition);
