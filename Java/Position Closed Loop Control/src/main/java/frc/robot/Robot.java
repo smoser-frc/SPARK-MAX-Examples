@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     ntEntryFF = pidGroup.add("FeedForward", kFF).getEntry();
     ntEntryMaxOut = pidGroup.add("MaxOut", kMaxOutput).
             withWidget(BuiltInWidgets.kNumberSlider).
-            withProperties(Map.of("min", 0, "max", 1)).getEntry();
+            withProperties(Map.of("min", -1, "max", 0)).getEntry();
     ntEntryMinOut = pidGroup.add("MinOut", kMinOutput).
             withWidget(BuiltInWidgets.kNumberSlider).
             withProperties(Map.of("min", 0, "max", 1)).getEntry();
