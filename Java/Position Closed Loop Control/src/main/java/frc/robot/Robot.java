@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -29,18 +28,24 @@ public class Robot extends TimedRobot {
   private static final int lRearID = 2;
   private static final int rFrontID = 4;
   private static final int rRearID = 3;
-  private CANSparkMax lFrontMotor, lRearMotor, rFrontMotor, rRearMotor;
+
+  // Initial PID coefficients
+  private double kP = 0.1;
+  private double kI = 1e-4;
+  private double kD = 1;
+  private double kIz = 0;
+  private double kFF = 0;
+  private double kMaxOutput = 1;
+  private double kMinOutput = -1;
+
+  private ArrayList<MotorInfo> motors;
   private ShuffleboardTab shuffTab = Shuffleboard.getTab("SparkMax");
   private NetworkTableEntry ntEntryP, ntEntryI, ntEntryD, ntEntryIz,
           ntEntryFF, ntEntryMaxOut, ntEntryMinOut,
           driveGo, driveRotations;
   private boolean lastGo = false;
-  private double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
-  private ArrayList<CANSparkMax> motors = new ArrayList<CANSparkMax>();
-  private ArrayList<SparkMaxPIDController> pidControllers = new ArrayList<SparkMaxPIDController>();
-  private ArrayList<String> names = new ArrayList<String>();
 
-  private CANSparkMax motorInit(String name, int canID) {
+  private MotorInfo motorInit(String name, int canID) {
     // initialize motor
     CANSparkMax m = new CANSparkMax(canID, MotorType.kBrushless);
 
@@ -69,25 +74,24 @@ public class Robot extends TimedRobot {
     pidc.setFF(kFF);
     pidc.setOutputRange(kMinOutput, kMaxOutput);
 
-    // SmartDashboard.putNumber("Set Rotations", 0);
-    ShuffleboardLayout motorGroup = shuffTab.getLayout(name, BuiltInLayouts.kList);
-    motorGroup.add("Rotations", encoder.getPosition());
-    motorGroup.add("Target", encoder.getPosition());
+    MotorInfo motorInfo = new MotorInfo();
+    motorInfo.motor = m;
+    motorInfo.encoder = encoder;
+    motorInfo.pidController = pidc;
+    motorInfo.id = canID;
+    motorInfo.name = name;
 
-    return m;
+    ShuffleboardLayout motorGroup = shuffTab.getLayout(name + "(" + canID + ")", BuiltInLayouts.kList);
+    motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).getEntry();
+    motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).getEntry();
+
+    return motorInfo;
   }
 
 
   @Override
   public void robotInit() {
-    // PID coefficients
-    kP = 0.1;
-    kI = 1e-4;
-    kD = 1;
-    kIz = 0;
-    kFF = 0;
-    kMaxOutput = 1;
-    kMinOutput = -1;
+    motors = new ArrayList<MotorInfo>();
 
     ShuffleboardLayout pidGroup = shuffTab.getLayout("PID", BuiltInLayouts.kList);
     ntEntryP = pidGroup.add("P Gain", kP).getEntry();
@@ -104,22 +108,13 @@ public class Robot extends TimedRobot {
 
 
     ShuffleboardLayout driveGroup = shuffTab.getLayout("Drive", BuiltInLayouts.kList);
-    driveGo = driveGroup.add("Go", false).getEntry();
+    driveGo = driveGroup.add("Go", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     driveRotations = driveGroup.add("Rotations", 0).getEntry();
 
-    lFrontMotor = motorInit("LFront", lFrontID);
-    lRearMotor = motorInit("LRear", lRearID);
-    rFrontMotor = motorInit("RFront", rFrontID);
-    rRearMotor = motorInit("RRear", rRearID);
-
-    motors.add(lFrontMotor); names.add("LFront");
-    motors.add(lRearMotor);  names.add("LRear");
-    motors.add(rFrontMotor); names.add("RFront");
-    motors.add(rRearMotor);  names.add("RRear");
-
-    for (int i=0; i<motors.size(); i++) {
-      pidControllers.add(motors.get(i).getPIDController());
-    }
+    motors.add(motorInit("LFront", lFrontID));
+    motors.add(motorInit("LRear", lRearID));
+    motors.add(motorInit("RFront", rFrontID));
+    motors.add(motorInit("RRear", rRearID));
   }
 
   private void updatePidControllers() {
@@ -135,44 +130,44 @@ public class Robot extends TimedRobot {
 
     if (xP != kP) {
         kP = xP;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setP(xP);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setP(xP);
         }
     }
 
     if (xI != kI) {
         kI = xI;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setI(xI);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setI(xI);
         }
     }
 
     if (xD != kD) {
         kD = xD;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setD(xD);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setD(xD);
         }
     }
 
     if (xIz != kIz) {
         kIz = xIz;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setIZone(xIz);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setIZone(xIz);
         }
     }
 
     if (xFF != kFF) {
         kFF = xFF;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setFF(xFF);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setFF(xFF);
         }
     }
 
     if ((xMax != kMaxOutput) || (xMin != kMaxOutput)) {
         kMinOutput = xMax;
         kMaxOutput = xMax;
-        for (int i=0; i<pidControllers.size(); i++) {
-            pidControllers.get(i).setOutputRange(xMin, xMax);
+        for (int i=0; i<motors.size(); i++) {
+            motors.get(i).pidController.setOutputRange(xMin, xMax);
         }
     }
   }
@@ -194,35 +189,39 @@ public class Robot extends TimedRobot {
      *  com.revrobotics.CANSparkMax.ControlType.kVoltage
      */
     boolean curGo = driveGo.getBoolean(false);
+    MotorInfo m;
     if (curGo == lastGo) {
         // no change. We start or stop on Go toggle;
-        RelativeEncoder enc;
         for (int i=0; i<motors.size(); i++) {
-            enc = motors.get(i).getEncoder();
-	    // TODO: update the motors current shuffleboard value.
+            m = motors.get(i);
+            m.ntRotCurrent.setDouble(m.encoder.getPosition());
         }
     } else {
         double rotations = driveRotations.getDouble(0.0f);
-        updatePidControllers();
-        RelativeEncoder enc;
+        double targetRot, currentRot;
         if (curGo) {
-            for(int i=0; i<pidControllers.size(); i++) {
-                enc = motors.get(i).getEncoder();
-                double target = enc.getPosition() + rotations;
-                pidControllers.get(i).setReference(target, CANSparkMax.ControlType.kPosition);
-                // TODO: update the motor's target shuffleboard Value.
+            // go
+            updatePidControllers();
+            for(int i=0; i<motors.size(); i++) {
+                m = motors.get(i);
+                currentRot = m.encoder.getPosition();
+                targetRot = currentRot + rotations;
+                m.pidController.setReference(targetRot, CANSparkMax.ControlType.kPosition);
+                m.ntRotCurrent.setDouble(currentRot);
+                m.ntRotTarget.setDouble(targetRot);
             }
         } else {
-            for(int i=0; i<pidControllers.size(); i++) {
-                enc = motors.get(i).getEncoder();
-                pidControllers.get(i).setReference(enc.getPosition(), CANSparkMax.ControlType.kPosition);
-                // TODO: update the motor's target shuffleboard Value.
+            // stop;
+            for(int i=0; i<motors.size(); i++) {
+                m = motors.get(i);
+                currentRot = m.encoder.getPosition() + rotations;
+                targetRot = currentRot;
+                m.pidController.setReference(currentRot, CANSparkMax.ControlType.kPosition);
+                m.ntRotCurrent.setDouble(currentRot);
+                m.ntRotTarget.setDouble(targetRot);
             }
         }
         lastGo = curGo;
-        // m_pidController.setReference(rotations, CANSparkMax.ControlType.kPosition);
-        // SmartDashboard.putNumber("SetPoint", rotations);
-        // SmartDashboard.putNumber("ProcessVariable", m_encoder.getPosition());
     }
 
   }
