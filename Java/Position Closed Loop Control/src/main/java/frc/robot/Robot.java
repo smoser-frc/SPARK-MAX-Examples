@@ -127,7 +127,14 @@ public class Robot extends TimedRobot {
     double xFF = ntEntryFF.getDouble(0.0);
     double xMax = ntEntryMaxOut.getDouble(0.0);
     double xMin = ntEntryMinOut.getDouble(0.0);
-    // double rotations = SmartDashboard.getNumber("Set Rotations", 0);
+
+    boolean changeP = (xP == kP);
+    boolean changeI = (xI == kI);
+    boolean changeD = (xD == kD);
+    boolean changeIz = (xIz == kIz);
+    boolean changeFF = (xFF == kFF);
+    boolean changeMax = (xMax == kMaxOutput);
+    boolean changeMin = (xMin == kMinOutput);
 
     MotorInfo m;
     SparkMaxPIDController p;
@@ -138,23 +145,23 @@ public class Robot extends TimedRobot {
         if (!m.ntEnable.getBoolean(true)) {
             continue;
         }
-        if (xP != kP) {
+        if (changeP) {
             kP = xP;
             p.setP(xP);
         }
-        if (xI != kI) {
+        if (changeI) {
             kI = xI;
             p.setI(xI);
         }
-        if (xIz != kIz) {
+        if (changeIz) {
             kIz = xIz;
             p.setIZone(xIz);
         }
-        if (xFF != kFF) {
+        if (changeFF) {
             kFF = xFF;
             p.setFF(xFF);
         }
-        if ((xMax != kMaxOutput) || (xMin != kMaxOutput)) {
+        if (changeMax || changeMin) {
             kMinOutput = xMax;
             kMaxOutput = xMax;
             p.setOutputRange(xMin, xMax);
