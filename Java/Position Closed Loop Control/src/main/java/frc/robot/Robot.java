@@ -149,6 +149,9 @@ public class Robot extends TimedRobot {
         }
         m.motor.setInverted(m.ntInvert.getBoolean(false));
 
+        // zero out the encoder counter
+        m.encoder.setPosition(0);
+
         if (changeP) {
             kP = xP;
             p.setP(xP);
