@@ -101,10 +101,10 @@ public class Robot extends TimedRobot {
     ntEntryD = pidGroup.add("D Gain", kD).getEntry();
     ntEntryIz = pidGroup.add("I Zone", kIz).getEntry();
     ntEntryFF = pidGroup.add("FeedForward", kFF).getEntry();
-    ntEntryMaxOut = pidGroup.add("MaxOut", kMaxOutput).
+    ntEntryMinOut = pidGroup.add("MinOut", kMinOutput).
             withWidget(BuiltInWidgets.kNumberSlider).
             withProperties(Map.of("min", -1, "max", 0)).getEntry();
-    ntEntryMinOut = pidGroup.add("MinOut", kMinOutput).
+    ntEntryMaxOut = pidGroup.add("MaxOut", kMaxOutput).
             withWidget(BuiltInWidgets.kNumberSlider).
             withProperties(Map.of("min", 0, "max", 1)).getEntry();
 
