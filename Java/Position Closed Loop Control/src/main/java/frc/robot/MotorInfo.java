@@ -15,5 +15,5 @@ public class MotorInfo {
     public NetworkTableEntry ntRotTarget;
     public NetworkTableEntry ntRotCurrent;
     public NetworkTableEntry ntEnable;
-
+    public NetworkTableEntry ntInvert;
 }

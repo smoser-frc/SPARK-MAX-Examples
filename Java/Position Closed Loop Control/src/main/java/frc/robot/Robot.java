@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
           driveGo, driveRotations;
   private boolean lastGo = false;
 
-  private MotorInfo motorInit(String name, int canID) {
+  private MotorInfo motorInit(String name, int canID, boolean invert) {
     // initialize motor
     CANSparkMax m = new CANSparkMax(canID, MotorType.kBrushless);
 
@@ -85,6 +85,7 @@ public class Robot extends TimedRobot {
     motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).getEntry();
     motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).getEntry();
     motorInfo.ntEnable = motorGroup.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    motorInfo.ntInvert = motorGroup.add("Invert", invert).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
 
     return motorInfo;
   }
@@ -112,12 +113,13 @@ public class Robot extends TimedRobot {
     driveGo = driveGroup.add("Go", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     driveRotations = driveGroup.add("Rotations", 0).getEntry();
 
-    motors.add(motorInit("LFront", lFrontID));
-    motors.add(motorInit("LRear", lRearID));
-    motors.add(motorInit("RFront", rFrontID));
-    motors.add(motorInit("RRear", rRearID));
+    motors.add(motorInit("LFront", lFrontID, false));
+    motors.add(motorInit("LRear", lRearID, false));
+    motors.add(motorInit("RFront", rFrontID, false));
+    motors.add(motorInit("RRear", rRearID, false));
   }
 
+  // this is called once per 'Go'
   private void updatePidControllers() {
     // read PID coefficients from SmartDashboard
     double xP = ntEntryP.getDouble(0.0);
@@ -145,6 +147,8 @@ public class Robot extends TimedRobot {
         if (!m.ntEnable.getBoolean(true)) {
             continue;
         }
+        m.motor.setInverted(m.ntInvert.getBoolean(false));
+
         if (changeP) {
             kP = xP;
             p.setP(xP);
