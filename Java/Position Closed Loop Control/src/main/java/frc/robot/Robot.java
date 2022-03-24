@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
     motorInfo.name = name;
 
     ShuffleboardLayout motorGroup = shuffTab.
-        getLayout(name + "(" + canID + ")", BuiltInLayouts.kList).withSize(1, 3);
+        getLayout(name + "(" + canID + ")", BuiltInLayouts.kGrid).withSize(1, 3);
     motorInfo.ntEnable = motorGroup.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).
         withPosition(0, 0).getEntry();
     motorInfo.ntInvert = motorGroup.add("Invert", invert).withWidget(BuiltInWidgets.kToggleSwitch).
