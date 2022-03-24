@@ -81,11 +81,16 @@ public class Robot extends TimedRobot {
     motorInfo.id = canID;
     motorInfo.name = name;
 
-    ShuffleboardLayout motorGroup = shuffTab.getLayout(name + "(" + canID + ")", BuiltInLayouts.kList).withSize(1, 2);
-    motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).getEntry();
-    motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).getEntry();
-    motorInfo.ntEnable = motorGroup.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    motorInfo.ntInvert = motorGroup.add("Invert", invert).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    ShuffleboardLayout motorGroup = shuffTab.
+        getLayout(name + "(" + canID + ")", BuiltInLayouts.kList).withSize(1, 3);
+    motorInfo.ntEnable = motorGroup.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).
+        withPosition(0, 0).getEntry();
+    motorInfo.ntInvert = motorGroup.add("Invert", invert).withWidget(BuiltInWidgets.kToggleSwitch).
+        withPosition(0, 1).getEntry();
+    motorInfo.ntRotCurrent = motorGroup.add("Rotations", encoder.getPosition()).
+        withPosition(0, 2).getEntry();
+    motorInfo.ntRotTarget = motorGroup.add("Target", encoder.getPosition()).
+        withPosition(0, 3).getEntry();
 
     return motorInfo;
   }
