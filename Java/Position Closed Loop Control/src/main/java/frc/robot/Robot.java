@@ -230,11 +230,14 @@ public class Robot extends TimedRobot {
             // stop;
             for(int i=0; i<motors.size(); i++) {
                 m = motors.get(i);
-                currentRot = m.encoder.getPosition() + rotations;
-                targetRot = currentRot;
+                currentRot = m.encoder.getPosition();
                 // cancel the operation.  Another option is: m.motor.set(0);
                 m.pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
                 m.ntRotCurrent.setDouble(currentRot);
+                if (!m.ntEnable.getBoolean(true)) {
+                    continue;
+                }
+                targetRot = currentRot;
                 m.ntRotTarget.setDouble(targetRot);
             }
         }
