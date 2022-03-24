@@ -165,6 +165,10 @@ public class Robot extends TimedRobot {
             kI = xI;
             p.setI(xI);
         }
+        if (changeD) {
+            kD = xD;
+            p.setD(xD);
+        }
         if (changeIz) {
             kIz = xIz;
             p.setIZone(xIz);
