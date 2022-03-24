@@ -149,13 +149,13 @@ public class Robot extends TimedRobot {
     for (int i=0; i<motors.size(); i++) {
         m = motors.get(i);
         p = m.pidController;
+        // zero out the encoder counter
+        m.encoder.setPosition(0);
+
         if (!m.ntEnable.getBoolean(true)) {
             continue;
         }
         m.motor.setInverted(m.ntInvert.getBoolean(false));
-
-        // zero out the encoder counter
-        m.encoder.setPosition(0);
 
         if (changeP) {
             kP = xP;
