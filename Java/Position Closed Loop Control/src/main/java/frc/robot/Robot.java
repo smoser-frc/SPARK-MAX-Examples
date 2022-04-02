@@ -120,8 +120,9 @@ public class Robot extends TimedRobot {
 
     motors.add(motorInit("LFront", lFrontID, false));
     motors.add(motorInit("LRear", lRearID, false));
-    motors.add(motorInit("RFront", rFrontID, false));
-    motors.add(motorInit("RRear", rRearID, false));
+    // Right side motors are inverted.
+    motors.add(motorInit("RFront", rFrontID, true));
+    motors.add(motorInit("RRear", rRearID, true));
   }
 
   // this is called once per 'Go'
