@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
   private double kD = 1;
   private double kIz = 0;
   private double kFF = 0;
-  private double kMaxOutput = 1;
-  private double kMinOutput = -1;
+  private double kMaxOutput = 0.5;
+  private double kMinOutput = -0.5;
 
   private ArrayList<MotorInfo> motors;
   private ShuffleboardTab shuffTab = Shuffleboard.getTab("SparkMax");
