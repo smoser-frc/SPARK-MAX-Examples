@@ -123,6 +123,8 @@ public class Robot extends TimedRobot {
     // Right side motors are inverted.
     motors.add(motorInit("RFront", rFrontID, true));
     motors.add(motorInit("RRear", rRearID, true));
+
+    updatePidControllers(true);
   }
 
   // this is called once per 'Go'
@@ -216,7 +218,7 @@ public class Robot extends TimedRobot {
         double targetRot, currentRot;
         if (curGo) {
             // go
-            updatePidControllers();
+            updatePidControllers(false);
             for(int i=0; i<motors.size(); i++) {
                 m = motors.get(i);
                 if (!m.ntEnable.getBoolean(true)) {
