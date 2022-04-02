@@ -222,10 +222,9 @@ public class Robot extends TimedRobot {
                 if (!m.ntEnable.getBoolean(true)) {
                     continue;
                 }
-                currentRot = m.encoder.getPosition();
-                targetRot = currentRot + rotations;
+                targetRot = rotations;
                 m.pidController.setReference(targetRot, CANSparkMax.ControlType.kPosition);
-                m.ntRotCurrent.setDouble(currentRot);
+                m.ntRotCurrent.setDouble(0);
                 m.ntRotTarget.setDouble(targetRot);
             }
         } else {
