@@ -100,16 +100,16 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     motors = new ArrayList<MotorInfo>();
 
-    ShuffleboardLayout pidGroup = shuffTab.getLayout("PID", BuiltInLayouts.kList).withSize(2, 4);
-    ntEntryP = pidGroup.add("P Gain", kP).getEntry();
-    ntEntryI = pidGroup.add("I Gain", kI).getEntry();
-    ntEntryD = pidGroup.add("D Gain", kD).getEntry();
-    ntEntryIz = pidGroup.add("I Zone", kIz).getEntry();
-    ntEntryFF = pidGroup.add("FeedForward", kFF).getEntry();
-    ntEntryMinOut = pidGroup.add("MinOut", kMinOutput).
+    ShuffleboardLayout pidGroup = shuffTab.getLayout("PID", BuiltInLayouts.kGrid).withSize(2, 4);
+    ntEntryP = pidGroup.add("P Gain", kP).withPosition(0, 0).getEntry();
+    ntEntryI = pidGroup.add("I Gain", kI).withPosition(0, 1).getEntry();
+    ntEntryD = pidGroup.add("D Gain", kD).withPosition(0, 2).getEntry();
+    ntEntryIz = pidGroup.add("I Zone", kIz).withPosition(0, 3).getEntry();
+    ntEntryFF = pidGroup.add("FeedForward", kFF).withPosition(0, 4).getEntry();
+    ntEntryMinOut = pidGroup.add("MinOut", kMinOutput).withPosition(0, 5).
             withWidget(BuiltInWidgets.kNumberSlider).
             withProperties(Map.of("min", -1, "max", 0)).getEntry();
-    ntEntryMaxOut = pidGroup.add("MaxOut", kMaxOutput).
+    ntEntryMaxOut = pidGroup.add("MaxOut", kMaxOutput).withPosition(0, 6).
             withWidget(BuiltInWidgets.kNumberSlider).
             withProperties(Map.of("min", 0, "max", 1)).getEntry();
 
