@@ -126,7 +126,7 @@ public class Robot extends TimedRobot {
   }
 
   // this is called once per 'Go'
-  private void updatePidControllers() {
+  private void updatePidControllers(boolean force) {
     // read PID coefficients from SmartDashboard
     double xP = ntEntryP.getDouble(0.0);
     double xI = ntEntryI.getDouble(0.0);
@@ -136,13 +136,13 @@ public class Robot extends TimedRobot {
     double xMax = ntEntryMaxOut.getDouble(0.0);
     double xMin = ntEntryMinOut.getDouble(0.0);
 
-    boolean changeP = (xP == kP);
-    boolean changeI = (xI == kI);
-    boolean changeD = (xD == kD);
-    boolean changeIz = (xIz == kIz);
-    boolean changeFF = (xFF == kFF);
-    boolean changeMax = (xMax == kMaxOutput);
-    boolean changeMin = (xMin == kMinOutput);
+    boolean changeP = force || (xP != kP);
+    boolean changeI = force || (xI != kI);
+    boolean changeD = force || (xD != kD);
+    boolean changeIz = force || (xIz != kIz);
+    boolean changeFF = force || (xFF != kFF);
+    boolean changeMax = force || (xMax != kMaxOutput);
+    boolean changeMin = force || (xMin != kMinOutput);
 
     MotorInfo m;
     SparkMaxPIDController p;
@@ -150,10 +150,11 @@ public class Robot extends TimedRobot {
     for (int i=0; i<motors.size(); i++) {
         m = motors.get(i);
         p = m.pidController;
+        //
         // zero out the encoder counter
         m.encoder.setPosition(0);
 
-        if (!m.ntEnable.getBoolean(true)) {
+        if (!force && !m.ntEnable.getBoolean(true)) {
             continue;
         }
         m.motor.setInverted(m.ntInvert.getBoolean(false));
@@ -179,7 +180,7 @@ public class Robot extends TimedRobot {
             p.setFF(xFF);
         }
         if (changeMax || changeMin) {
-            kMinOutput = xMax;
+            kMinOutput = xMin;
             kMaxOutput = xMax;
             p.setOutputRange(xMin, xMax);
         }
