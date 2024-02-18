@@ -10,10 +10,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
 
 /**
  * Before Running:
@@ -50,17 +50,19 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * effect of the GUI layout.
  */
 public class Robot extends TimedRobot {
-  private static final int deviceID = 1;
+  private static int Constants_Launch_shootCANID = 45;
+  private static int Constants_Launch_angleCANID = 46;
+  private static final int deviceID = Constants_Launch_shootCANID;
   private CANSparkMax m_motor;
-  private SparkMaxPIDController m_pidController;
-  private RelativeEncoder m_encoder;
+  private SparkPIDController m_pidController;
+  private SparkAbsoluteEncoder m_encoder;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
 
   @Override
   public void robotInit() {
     // initialize motor
-    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
 
+    m_motor = new CANSparkMax(deviceID, CANSparkLowLevel.MotorType.kBrushless);
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
      * in the SPARK MAX to their factory default state. If no argument is passed, these
@@ -70,7 +72,7 @@ public class Robot extends TimedRobot {
 
     // initialze PID controller and encoder objects
     m_pidController = m_motor.getPIDController();
-    m_encoder = m_motor.getEncoder();
+    m_encoder = m_motor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
 
     // PID coefficients
     kP = 5e-5; 
@@ -120,6 +122,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Feed Forward", kFF);
     SmartDashboard.putNumber("Max Output", kMaxOutput);
     SmartDashboard.putNumber("Min Output", kMinOutput);
+    SmartDashboard.putNumber("Posititon", m_encoder.getPosition());
+    SmartDashboard.putNumber("Velocity", m_encoder.getVelocity());
 
     // display Smart Motion coefficients
     SmartDashboard.putNumber("Max Velocity", maxVel);
